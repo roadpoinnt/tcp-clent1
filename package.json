@@ -1,16 +1,19 @@
 {
-  "name": "react-example",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  {
+  "name": "tcp-backend",
+  "version": "1.0.0",
+  "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx server.ts",
-    "start": "tsx server.ts",
-    "build": "vite build",
-    "preview": "vite preview",
-    "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
+  "dependencies": {
+    "net": "^1.0.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
   "dependencies": {
     "@google/genai": "^1.29.0",
     "@tailwindcss/vite": "^4.1.14",
