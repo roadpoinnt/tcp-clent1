@@ -1,24 +1,47 @@
+import express from "express";
+import cors from "cors";
 import net from "net";
 
-const HOST = process.env.TCP_HOST || "127.0.0.1";
-const PORT = Number(process.env.TCP_PORT) || 5000;
+const app = express();
 
-const server = net.createServer((socket) => {
-  console.log("Client connected");
+app.use(cors());
+app.use(express.json());
 
-  const client = net.createConnection({ host: HOST, port: PORT }, () => {
-    console.log("Connected to TCP server");
-  });
+// ✅ POST API (this was missing)
+app.post("/send", (req, res) => {
+  const { data } = req.body;
 
-  socket.on("data", (data) => {
+  if (!data) {
+    return res.status(400).send("No data provided");
+  }
+
+  const client = new net.Socket();
+
+  // 🔴 IMPORTANT: এখানে তোমার real TCP server দাও
+  const HOST = "trackfleet.in";
+  const PORT = 8449;
+
+  client.connect(PORT, HOST, () => {
     client.write(data);
   });
 
-  client.on("data", (data) => {
-    socket.write(data);
+  client.on("data", (response) => {
+    res.send(response.toString());
+    client.destroy();
+  });
+
+  client.on("error", (err) => {
+    res.status(500).send("TCP Error: " + err.message);
   });
 });
 
-server.listen(process.env.PORT || 3000, () => {
-  console.log("Server running");
+// ✅ Test route
+app.get("/", (req, res) => {
+  res.send("✅ Backend running");
+});
+
+const PORT_SERVER = process.env.PORT || 3000;
+
+app.listen(PORT_SERVER, () => {
+  console.log("Server running on port " + PORT_SERVER);
 });
