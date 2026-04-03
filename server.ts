@@ -45,3 +45,28 @@ const PORT_SERVER = process.env.PORT || 3000;
 app.listen(PORT_SERVER, () => {
   console.log("Server running on port " + PORT_SERVER);
 });
+app.post("/send", (req, res) => {
+  const { data } = req.body;
+
+  if (!data) {
+    return res.status(400).send("No data provided");
+  }
+
+  const client = new net.Socket();
+
+  const HOST = "YOUR_TCP_IP";   // 🔴 change this
+  const PORT = 1234;            // 🔴 change this
+
+  client.connect(PORT, HOST, () => {
+    client.write(data);
+  });
+
+  client.on("data", (response) => {
+    res.send(response.toString());
+    client.destroy();
+  });
+
+  client.on("error", (err) => {
+    res.status(500).send("TCP Error: " + err.message);
+  });
+});
